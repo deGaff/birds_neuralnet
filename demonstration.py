@@ -37,7 +37,7 @@ for i in range(1,7):
     thinfactor = 1 # коэффициент, на который умножается среднее значение семплов на всём протяжении при использовании алгоритма отсечения
     thinned_samples = thinsamples(samples, thinfactor) # вызов функции отсечения 
     fft = np.zeros(fft_len) # создание массива выбранной длины, заполненного нулями
-    win = signal.gaussian(fft_len, std=15) # получение щначений окна
+    win = signal.gaussian(fft_len, std=15) # получение значений окна
     for i in range(len(thinned_samples) // fft_len): # цикл по количеству промежутков выбранной длины в массиве семлов (после использования функции отсечения)
         temp = thinned_samples[i * fft_len:(i + 1) * fft_len] # получение промежутка выбранной длины
         fft += np.absolute(np.fft.fft(temp * win)) # сумма всех оконных преобразований фурье
