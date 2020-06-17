@@ -30,26 +30,26 @@ for i in range(1,7):
 
     namefile = f"Demonstration\({i}).wav"
     w = wave.open(namefile, 'r')
-    (nchannels, sampwidth, framerate, nframes, comptype, compname) = w.getparams()
-    frames = w.readframes(nframes)
-    samples = np.frombuffer(frames, dtype=types[sampwidth])
-    fft_len = 1024
-    thinfactor = 1
-    thinned_samples = thinsamples(samples, thinfactor)
-    fft = np.zeros(fft_len)
-    win = signal.gaussian(fft_len, std=15)
-    for i in range(len(thinned_samples) // fft_len):
-        temp = thinned_samples[i * fft_len:(i + 1) * fft_len]
-        fft += np.absolute(np.fft.fft(temp * win))
-    fft = fft / (len(thinned_samples) // fft_len)
-    fft = fft / fft.max()
-    a = indOfFreq(100, 1024, framerate)
-    b = indOfFreq(6000, 1024, framerate)
-    fft = fft[a:b]
+    (nchannels, sampwidth, framerate, nframes, comptype, compname) = w.getparams() #получение параметров .wav файла
+    frames = w.readframes(nframes) # считывание кадров файла
+    samples = np.frombuffer(frames, dtype=types[sampwidth]) # получение семплов файла
+    fft_len = 1024 # количество семплов в одном преобразовании фурье 
+    thinfactor = 1 # коэффициент, на который умножается среднее значение семплов на всём протяжении при использовании алгоритма отсечения
+    thinned_samples = thinsamples(samples, thinfactor) # вызов функции отсечения 
+    fft = np.zeros(fft_len) # создание массива выбранной длины, заполненного нулями
+    win = signal.gaussian(fft_len, std=15) # получение щначений окна
+    for i in range(len(thinned_samples) // fft_len): # цикл по количеству промежутков выбранной длины в массиве семлов (после использования функции отсечения)
+        temp = thinned_samples[i * fft_len:(i + 1) * fft_len] # получение промежутка выбранной длины
+        fft += np.absolute(np.fft.fft(temp * win)) # сумма всех оконных преобразований фурье
+    fft = fft / (len(thinned_samples) // fft_len) # получение среднего значения (деление полученной суммы на кол-во)
+    fft = fft / fft.max() # нормировка в (0,1)
+    a = indOfFreq(100, 1024, framerate) # получение индекса верхней границы частоты
+    b = indOfFreq(6000, 1024, framerate) # получение индекса нижней границы частоты
+    fft = fft[a:b] # получение нужного нам интервала 
 
-    RFC_predictions = RFC_model.predict(fft.reshape(1, -1))
+    RFC_predictions = RFC_model.predict(fft.reshape(1, -1)) # получение прогноза нейронной сети 
 
-    print(RFC_predictions)
+    print(RFC_predictions) # вывод прогноза нейронной сети
 
 
 # 1 - Nightingale
